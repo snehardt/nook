@@ -60,8 +60,11 @@ if config_env() == :prod do
     http: [ip: bind_ip, port: String.to_integer(System.get_env("PORT", "4000"))],
     check_origin: ["https://#{host}"]
 
+  database_url = required.("DATABASE_URL")
+
   config :nook, Nook.Repo,
-    url: required.("DATABASE_URL"),
+    url: database_url,
+    port: URI.parse(database_url).port || 5432,
     pool_size: String.to_integer(System.get_env("POOL_SIZE", "10")),
     idle_interval: String.to_integer(System.get_env("DB_IDLE_INTERVAL", "15000")),
     ssl:

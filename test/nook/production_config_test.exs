@@ -27,6 +27,13 @@ defmodule Nook.ProductionConfigTest do
 
   defp config, do: Config.Reader.read!("config/runtime.exs", env: :prod)
 
+  test "production database URLs override the local development port" do
+    System.put_env("DATABASE_URL", "postgresql://nook:example@database.example/nook")
+    assert config()[:nook][Nook.Repo][:port] == 5432
+    System.put_env("DATABASE_URL", "postgresql://nook:example@database.example:6543/nook")
+    assert config()[:nook][Nook.Repo][:port] == 6543
+  end
+
   test "production requires a strong secret and explicit host" do
     System.delete_env("SECRET_KEY_BASE")
     assert_raise RuntimeError, ~r/SECRET_KEY_BASE/, &config/0

@@ -344,6 +344,8 @@ Milestone 3 only. Quality-of-life ideas remain for a later pass. Richer particip
 
 # 0.11.0 — Google sign-in and Render preparation (November 12, 2026)
 
+- First Render launch exposed a production database URL without an explicit port inheriting the local 55432 setting. Production now defaults to PostgreSQL's 5432 and respects explicit URL ports; both cases have regression coverage. Direct verified-TLS Neon connectivity passed before redeployment.
+
 - Added server-side Google OpenID Connect through Assent, with session-bound state, a five-minute flow lifetime, PKCE, random nonce, verified HTTPS requests, and validated token signature/issuer/audience/expiry/nonce. Access and ID tokens are not persisted or logged. Only basic identity/email access is requested. Google's official sign-in logo is served locally.
 - Added a unique Google subject to existing Nook users. Google creates a confirmed account without sending email or requiring a Nook password. Matching email alone never links an existing account; linking requires recent sign-in to the same confirmed Nook account. Session renewal preserves guest-board ownership. Remember-me cookies are secure in production.
 - Added `NOOK_AUTH_MODE=google`: Google-only login, registration and settings screens work without SMTP credentials; email/password routes are disabled in that mode. Local development retains previous account flows by default. Google callback configuration is fixed to the production HTTPS hostname.
