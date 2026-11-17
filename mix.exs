@@ -4,7 +4,7 @@ defmodule Nook.MixProject do
   def project do
     [
       app: :nook,
-      version: "0.11.0",
+      version: "0.11.8",
       elixirc_paths: if(Mix.env() == :test, do: ["lib", "test/support"], else: ["lib"]),
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,

@@ -122,7 +122,7 @@ defmodule Nook.Boards do
       allowed =
         Map.take(
           changes,
-          ~w(x y w h text color done shape font_size text_color description z items group_id auto_width icon locked from_anchor to_anchor points linear)
+          ~w(x y w h text color done shape font_size text_color description z items group_id auto_width icon locked from_anchor to_anchor points linear rotation opacity stroke_width)
         )
 
       if Map.has_key?(board["elements"], id) do
@@ -231,10 +231,13 @@ defmodule Nook.Boards do
     Enum.all?(changes, fn
       {k, v} when k in ~w(x y) -> is_number(v) and abs(v) < 10_000_000
       {k, v} when k in ~w(w h) -> is_number(v) and v >= 50 and v <= 10_000
+      {"rotation", v} -> is_number(v) and abs(v) <= 1_000_000_000
       {"text", v} -> is_binary(v) and byte_size(v) <= 20_000
       {"color", v} -> v in ~w(lilac yellow peach mint white) or valid_hex?(v)
       {"icon", v} -> v in ~w(lightbulb arrow question warning checkmark person heart document)
       {"locked", v} -> is_boolean(v)
+      {"opacity", v} -> is_number(v) and v > 0 and v <= 1
+      {"stroke_width", v} -> is_integer(v) and v in 1..24
       {"linear", v} -> is_boolean(v)
       {"points", v} -> valid_points?(v)
       {"done", v} -> is_boolean(v)
@@ -299,7 +302,7 @@ defmodule Nook.Boards do
   defp stroke_budget?(_, _), do: true
 
   defp valid_element?(%{"type" => "stroke"} = el, _) do
-    valid_patch?(Map.take(el, ~w(x y w h z locked group_id color linear))) and
+    valid_patch?(Map.take(el, ~w(x y w h z locked group_id color linear rotation opacity))) and
       Enum.all?(~w(x y w h), &Map.has_key?(el, &1)) and
       valid_hex?(el["color"]) and is_integer(el["stroke_width"]) and el["stroke_width"] in 1..24 and
       is_list(el["points"]) and length(el["points"]) in 1..2048 and
@@ -313,8 +316,22 @@ defmodule Nook.Boards do
     valid_patch?(Map.take(el, ~w(group_id from_anchor to_anchor))) and from != to and
       Enum.all?([from, to], fn id ->
         case board["elements"][id] do
-          %{"type" => type} -> type != "connection"
-          _ -> false
+          %{"type" => "stroke"} ->
+            false
+
+          %{"type" => "text", "group_id" => group_id} when is_binary(group_id) ->
+            Enum.any?(board["elements"], fn {other_id, other} ->
+              other_id != id and other["type"] != "connection" and other["group_id"] == group_id
+            end)
+
+          %{"type" => "text"} ->
+            false
+
+          %{"type" => type} ->
+            type != "connection"
+
+          _ ->
+            false
         end
       end)
   end
@@ -328,7 +345,7 @@ defmodule Nook.Boards do
       valid_patch?(
         Map.take(
           el,
-          ~w(text color done shape font_size text_color description z items group_id auto_width icon locked)
+          ~w(text color done shape font_size text_color description z items group_id auto_width icon locked rotation)
         )
       ) and
       if el["type"] == "file" and Map.has_key?(el, "data"),

@@ -21,6 +21,7 @@ defmodule Nook.Boards.Store do
       true ->
         record = %Board{
           code: code,
+          room_code: Nook.Rooms.new_code(),
           owner_id: if(kind == :permanent, do: user.id),
           guest_owner_hash: if(kind == :guest, do: Access.hash(actor.guest_id)),
           legacy_access: false
@@ -74,7 +75,7 @@ defmodule Nook.Boards.Store do
       if Repo.get(Board, code) do
         :skipped
       else
-        record = %Board{code: code, legacy_access: true}
+        record = %Board{code: code, room_code: Nook.Rooms.new_code(), legacy_access: true}
         record = record |> Ecto.Changeset.change(Access.activity(record)) |> Repo.insert!()
         persist(record, %{"elements" => %{}}, board)
         :imported
@@ -87,6 +88,7 @@ defmodule Nook.Boards.Store do
 
     %{
       "code" => record.code,
+      "room_code" => record.room_code || record.code,
       "title" => record.title,
       "revision" => record.revision,
       "recent_operations" => record.recent_operations,
