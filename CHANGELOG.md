@@ -1,3 +1,12 @@
+# 0.11.9 — Continuous ink and separate file storage (November 18, 2026)
+
+- Removed the 2,048-point interruption and separate 500-stroke cap. A gesture can use the board's remaining 100,000-point allowance as one selectable, movable, rotatable, erasable and undoable stroke. Raw samples are preserved; drawing previews update once per animation frame. The existing 10,000-unit size and 2,000-object board safeguards remain.
+- Files now upload separately into private, board-scoped PostgreSQL attachment rows. Board snapshots, edits and new history entries contain references rather than file bytes. Reopening a board restores pictures automatically. Larger static images have lightweight previews; original downloads remain unchanged under More options. GIF previews preserve animation.
+- Increased uploads to 10 MB per file, with a configurable 100 MB storage allowance per board (including retained originals/previews). Identical uploads are stored once per board. Originals are retained for undo/replacement and inherit board access, expiry, revocation and deletion rules; permanent board removal cascades storage cleanup.
+- Existing inline uploads convert safely on first load without changing IDs, layout or element revisions. Conversion is idempotent. No new hosting service or account is required.
+- Moved large drawing recovery and same-tab undo history to IndexedDB, with legacy draft/history import and per-tab isolation. Retried history operations already acknowledged by the server are recognized after refresh.
+- Verification: 184 backend tests and 81 JavaScript tests passed. Browser checks covered a full 100,000-point stroke through the actual socket, unchanged preview/saved paths, rotation to 810 degrees, undo/redo across refresh and connection loss, a 2.8 MB image upload with a 653 KB preview, original download equality, automatic picture reload, and file replacement undo/redo. No browser exceptions.
+
 # 0.11.8 — A simpler room invitation screen (November 16, 2026)
 
 - Invite, Room, and the people count now open one compact room dialog with a six-character room code, a ready-to-copy invitation link, live participant names, and your display-name editor. Removed the separate invitation dialog and duplicate sharing paths.

@@ -1,8 +1,8 @@
-import {anchoredPanelPosition} from './visual-tools.mjs?v=0.11.8';
+import {anchoredPanelPosition} from './visual-tools.mjs?v=0.11.9';
 import {inkPoints,eraseInk,lassoStrokes,readDrawingSettings,writeDrawingSettings} from './ink-editing.mjs';
 import {rotatePoint,itemCenter} from './rotation.mjs';
 import {appendStandardColors} from './color-palette.mjs';
-export const MAX_STROKE_POINTS=2048;
+export const MAX_STROKE_POINTS=100000;
 // Iterative simplification avoids deep recursion on long, scribbled strokes.
 export function simplifyStroke(points,tolerance=.5){
   if(points.length<3)return points;
@@ -22,10 +22,12 @@ export function strokePath(points,w=1,h=1,linear=false){
   return d+` L ${p.at(-1)}`;
 }
 export function makeStroke(points,color,width,id,z){
-  const xs=points.map(p=>p.x),ys=points.map(p=>p.y),pad=width/2+2;
-  const x=Math.min(...xs)-pad,y=Math.min(...ys)-pad,w=Math.max(50,Math.max(...xs)-x+pad),h=Math.max(50,Math.max(...ys)-y+pad);
+  if(!points.length||points.length>MAX_STROKE_POINTS)return null;
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  for(const p of points){minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y);}
+  const pad=width/2+2,x=minX-pad,y=minY-pad,w=Math.max(50,maxX-x+pad),h=Math.max(50,maxY-y+pad);
   if(w>10000||h>10000)return null;
-  return {id,type:'stroke',linear:true,x,y,w,h,text:'',color,stroke_width:width,z,points:points.slice(0,MAX_STROKE_POINTS).map(p=>[(p.x-x)/w,(p.y-y)/h])};
+  return {id,type:'stroke',linear:true,x,y,w,h,text:'',color,stroke_width:width,z,points:points.map(p=>[(p.x-x)/w,(p.y-y)/h])};
 }
 export function strokeSvg(el){
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('stroke-art');svg.setAttribute('viewBox',`0 0 ${el.w} ${el.h}`);svg.setAttribute('preserveAspectRatio','none');
@@ -98,14 +100,21 @@ export function installDrawing({root,canvas,world,listen,point,board,send,save,a
     if(grouping){draft={kind:'group',pointer:e.pointerId,start:p,end:p,node:document.createElement('div')};draft.node.className='draw-group-box';world.append(draft.node);}
     else if(settings.mode==='lasso'){const node=document.createElementNS('http://www.w3.org/2000/svg','svg'),path=document.createElementNS(node.namespaceURI,'path');node.classList.add('ink-lasso');node.append(path);world.append(node);draft={kind:'lasso',pointer:e.pointerId,points:[p],node,path};lassoPreview();}
     else if(settings.mode==='eraser'){draft={kind:'erase',pointer:e.pointerId,last:p,radius:settings.eraserSize/(2*getZoom()),eraseType:settings.eraserType,originals:new Map(),sourcePoints:new Map(),parts:new Map(),removed:new Set(),previewNodes:[]};eraseStep(p);}
-    else {draft={kind:'ink',id:uid(),pointer:e.pointerId,points:[p],color:settings.color,width:settings.width,linear:!settings.smooth,opacity:settings.mode==='highlighter'?.3:1,node:document.createElement('div')};draft.node.className='drawing-preview';world.append(draft.node);preview();}
+    else {const remaining=MAX_STROKE_POINTS-Object.values(board().elements).filter(el=>el.type==='stroke').reduce((n,el)=>n+el.points.length,0);if(remaining<1){toast('This board has reached 100,000 drawing points. Erase some ink to keep drawing.');return;}draft={kind:'ink',remaining,minX:p.x,maxX:p.x,minY:p.y,maxY:p.y,id:uid(),pointer:e.pointerId,points:[p],color:settings.color,width:settings.width,linear:!settings.smooth,opacity:settings.mode==='highlighter'?.3:1,node:document.createElement('div')};draft.node.className='drawing-preview';world.append(draft.node);preview();}
     canvas.setPointerCapture(e.pointerId);paintCursor(p);
   },{capture:true});
-  function addPoint(p){const last=draft.points.at(-1);if(Math.hypot(p.x-last.x,p.y-last.y)<.1)return;if(draft.points.length>=MAX_STROKE_POINTS||draft.kind==='ink'&&!makeStroke([...draft.points,p],draft.color,draft.width,draft.id,0)){if(!draft.warned){toast('Stroke limit reached. Release to finish, then continue drawing.');draft.warned=true;}return;}draft.points.push(p);}
+  function addPoint(p){
+    const last=draft.points.at(-1);if(Math.hypot(p.x-last.x,p.y-last.y)<.1)return;
+    const pad=draft.width/2+2,large=draft.kind==='ink'&&(Math.max(draft.maxX,p.x)-Math.min(draft.minX,p.x)+pad*2>10000||Math.max(draft.maxY,p.y)-Math.min(draft.minY,p.y)+pad*2>10000);
+    if(draft.points.length>=(draft.remaining??MAX_STROKE_POINTS)||large){if(!draft.warned){toast(large?'This drawing spans the maximum canvas size. Release to save it.':'This board has reached 100,000 drawing points. Release to save this stroke.');draft.warned=true;}return;}
+    draft.points.push(p);if(draft.kind==='ink'){draft.minX=Math.min(draft.minX,p.x);draft.maxX=Math.max(draft.maxX,p.x);draft.minY=Math.min(draft.minY,p.y);draft.maxY=Math.max(draft.maxY,p.y);}
+  }
+  let previewFrame=0;
+  function schedulePreview(){if(previewFrame)return;previewFrame=requestAnimationFrame(()=>{previewFrame=0;if(draft?.kind==='ink')preview();else if(draft?.kind==='lasso')lassoPreview();});}
   listen(canvas,'pointermove',e=>{if(!enabled)return;paintCursor(point(e));if(!draft||draft.pointer!==e.pointerId)return;e.preventDefault();if(e.pointerType==='pen')penAt=performance.now();
     const events=e.getCoalescedEvents?.(),samples=events?.length?events:[e];
     for(const sample of samples){const p=point(sample);if(draft.kind==='group'){draft.end=p;groupPreview();}else if(draft.kind==='erase')eraseStep(p);else addPoint(p);}
-    if(draft.kind==='lasso')lassoPreview();else if(draft.kind==='ink')preview();
+    if(['lasso','ink'].includes(draft.kind))schedulePreview();
   },{capture:true});
   listen(canvas,'pointerup',e=>{if(!draft||draft.pointer!==e.pointerId)return;e.preventDefault();e.stopImmediatePropagation();
     if(draft.kind==='group'){const ids=enclosedStrokes(Object.values(board().elements),groupBox()).map(el=>el.id);clear();groupStrokes(ids);}

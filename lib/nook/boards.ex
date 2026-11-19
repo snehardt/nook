@@ -108,7 +108,7 @@ defmodule Nook.Boards do
        })
        when is_binary(id) and byte_size(id) in 1..64 and type in @types and is_number(x) and
               is_number(y) do
-    if map_size(board["elements"]) < 2000 and byte_size(Jason.encode!(el)) < 1_500_000 and
+    if map_size(board["elements"]) < 2000 and byte_size(Jason.encode!(el)) < 8_000_000 and
          valid_element?(el, board) and stroke_budget?(el, board) do
       {:ok, put_in(board, ["elements", id], el)}
     else
@@ -170,7 +170,7 @@ defmodule Nook.Boards do
 
     if length(ops) in 1..2000 and length(Enum.uniq(ids)) == length(ids) and
          Enum.all?(ops, &(is_map(&1) and &1["type"] in ~w(put patch delete))) and
-         byte_size(Jason.encode!(ops)) < 1_500_000 do
+         byte_size(Jason.encode!(ops)) < 12_000_000 do
       Enum.reduce_while(ops, :ok, fn op, :ok ->
         case check_version(board, op) do
           :ok -> {:cont, :ok}
@@ -254,7 +254,7 @@ defmodule Nook.Boards do
     end)
   end
 
-  defp valid_points?(points) when is_list(points) and length(points) in 1..2048 do
+  defp valid_points?(points) when is_list(points) and length(points) in 1..100_000 do
     Enum.all?(points, fn
       [x, y] -> is_number(x) and is_number(y) and x >= 0 and x <= 1 and y >= 0 and y <= 1
       _ -> false
@@ -295,8 +295,7 @@ defmodule Nook.Boards do
       |> Map.values()
       |> Enum.filter(&(&1["type"] == "stroke" and &1["id"] != el["id"]))
 
-    length(strokes) < 500 and
-      length(el["points"]) + Enum.sum(Enum.map(strokes, &length(&1["points"]))) <= 100_000
+    length(el["points"]) + Enum.sum(Enum.map(strokes, &length(&1["points"]))) <= 100_000
   end
 
   defp stroke_budget?(_, _), do: true
@@ -305,7 +304,7 @@ defmodule Nook.Boards do
     valid_patch?(Map.take(el, ~w(x y w h z locked group_id color linear rotation opacity))) and
       Enum.all?(~w(x y w h), &Map.has_key?(el, &1)) and
       valid_hex?(el["color"]) and is_integer(el["stroke_width"]) and el["stroke_width"] in 1..24 and
-      is_list(el["points"]) and length(el["points"]) in 1..2048 and
+      is_list(el["points"]) and length(el["points"]) in 1..100_000 and
       Enum.all?(el["points"], fn
         [x, y] -> is_number(x) and is_number(y) and x >= 0 and x <= 1 and y >= 0 and y <= 1
         _ -> false
@@ -338,7 +337,7 @@ defmodule Nook.Boards do
 
   defp valid_element?(%{"type" => "connection"}, _), do: false
 
-  defp valid_element?(el, _) do
+  defp valid_element?(el, board) do
     geometry = Map.take(el, ~w(x y w h))
 
     map_size(geometry) == 4 and valid_patch?(geometry) and
@@ -348,13 +347,20 @@ defmodule Nook.Boards do
           ~w(text color done shape font_size text_color description z items group_id auto_width icon locked rotation)
         )
       ) and
-      if el["type"] == "file" and Map.has_key?(el, "data"),
-        do: valid_file?(el),
+      if el["type"] == "file" and (Map.has_key?(el, "data") or Map.has_key?(el, "asset_id")),
+        do: valid_file_reference?(el, board),
         else:
           is_binary(el["text"]) and
             (el["type"] != "icon" or
                el["icon"] in ~w(lightbulb arrow question warning checkmark person heart document))
   end
+
+  defp valid_file_reference?(%{"asset_id" => id} = el, board) do
+    not Map.has_key?(el, "data") and
+      Nook.Attachments.reference?(board["code"], id, el["name"], el["mime"])
+  end
+
+  defp valid_file_reference?(el, _), do: valid_file?(el)
 
   defp valid_file?(%{"name" => name, "mime" => mime, "data" => data})
        when is_binary(name) and byte_size(name) <= 255 and is_binary(data) do

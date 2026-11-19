@@ -25,7 +25,7 @@ export class BoardHistory {
     for(const [id,change]of Object.entries(entry.changes)){
       const current=clean(board.elements[id]),expected=clean(change[source]),desired=clean(change[target]);
       if(!expected||!desired){if(!equal(current,expected))return {error:'Someone changed this item since your action. Undo/redo will not replace their work.'};if(!desired&&Object.values(board.elements).some(e=>e.type==='connection'&&(e.from===id||e.to===id)&&!entry.changes[e.id]))return {error:'Someone connected this item since your action. Remove that connection before undoing its creation.'};ops.push(desired?{type:'put',element:desired}:{type:'delete',id});continue;}
-      const keys=new Set([...Object.keys(expected),...Object.keys(desired)]),changes={};let replacement=false;
+      const keys=new Set([...Object.keys(expected),...Object.keys(desired)]),changes={};let replacement=current?.type==='file'&&['asset_id','name','mime','size','data'].some(key=>!equal(expected[key],desired[key]));
       for(const key of keys)if(!equal(expected[key],desired[key])){if(!equal(current?.[key],expected[key]))return {error:'Someone changed this part of the item. Undo/redo will not replace their work.'};changes[key]=desired[key];replacement ||= desired[key]===undefined;}
       if(!current)return {error:'This item no longer exists. Undo/redo cannot replace another person’s changes.'};
       if(replacement){const element={...current,...changes};for(const key of Object.keys(element))if(element[key]===undefined)delete element[key];ops.push({type:'put',replace:true,element});}
