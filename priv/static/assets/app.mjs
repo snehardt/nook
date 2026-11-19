@@ -1,8 +1,8 @@
-import {installStudioSettings} from './studio-settings.mjs?v=0.12.1';
-import {openRecoveryStore} from './recovery-store.mjs?v=0.12.1';
-import {BoardHistory,actionLabel,guardedHistoryPlan} from './history.mjs?v=0.12.1';
+import {installStudioSettings} from './studio-settings.mjs?v=0.12.2';
+import {openRecoveryStore} from './recovery-store.mjs?v=0.12.2';
+import {BoardHistory,actionLabel,guardedHistoryPlan} from './history.mjs?v=0.12.2';
 import {saveState,loadFailure} from './ui-state.mjs';
-import {createCanvasUI} from './canvas-ui.mjs?v=0.12.1';
+import {createCanvasUI} from './canvas-ui.mjs?v=0.12.2';
 import {Socket, Presence} from './phoenix.mjs';
 import {prepareOperation, optimisticBoard, wireOperation, resolveConflict, describeElement} from './collaboration-model.mjs';
 import {uid, applyOperation} from './canvas-model.mjs';

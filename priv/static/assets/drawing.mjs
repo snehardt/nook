@@ -1,4 +1,4 @@
-import {anchoredPanelPosition} from './visual-tools.mjs?v=0.12.1';
+import {anchoredPanelPosition} from './visual-tools.mjs?v=0.12.2';
 import {inkPoints,eraseInk,lassoStrokes,readDrawingSettings,writeDrawingSettings} from './ink-editing.mjs';
 import {rotatePoint,itemCenter} from './rotation.mjs';
 import {appendStandardColors} from './color-palette.mjs';

@@ -1,3 +1,11 @@
+# 0.12.2 — Final usability polish (November 19, 2026)
+
+- Task text fields use a text cursor throughout their editable area, including empty rows and space after words. Clicking or dragging within a text field selects text; card edges still move the card. Hand mode shows a grab cursor and keeps fields read-only.
+- New rounded/rectangular shapes start at 220 × 120 and tasks at 300 × 140. New circles remain square at 150 × 150; triangles and diamonds keep extra label room. Existing saved dimensions are unchanged, and tasks continue growing as content is added.
+- Increased contrast of secondary labels, task placeholders and tool icons within the same Quiet Studio palette. Sampled small labels have 5.73:1 contrast on the paper background; task placeholders have 5.48:1. Touch feedback now uses lavender instead of the browser's blue highlight.
+- Coarse-pointer creation tools, Select, Hand and Settings have 44px targets while artwork retains its size. Color/icon popovers fit beside the wider rail on phones. Enlarged touch targets for zoom, name editing and settings tabs.
+- Verification: 184 backend and 81 JavaScript tests passed. Browser checks covered empty/trailing-space text cursors, text selection without movement, keyboard creation and undo/redo, growing checklists, resized-card persistence, circle geometry, Hand/Select cursor modes, touch portrait/landscape layouts, connections, rotation, unchanged ink, uploads and invitation-based sharing. No browser exceptions.
+
 # 0.12.1 — Approved welcome screen (November 19, 2026)
 
 - Applied the approved welcome layout: plum header, Welcome to Nook heading, New whiteboard and Join a room actions, and the illustrated whiteboard with notes and drawings. Preserved existing account navigation and settings.

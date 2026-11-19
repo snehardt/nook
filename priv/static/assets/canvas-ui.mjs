@@ -1,13 +1,13 @@
-import {fileUrl,uploadFile} from './file-storage.mjs?v=0.12.1';
+import {fileUrl,uploadFile} from './file-storage.mjs?v=0.12.2';
 import {rotatePoint,itemCenter,rotatedBounds,rotationChanges,angleStep} from './rotation.mjs';
-import {cleanedStrokes} from './drawing-shapes.mjs?v=0.12.1';
+import {cleanedStrokes} from './drawing-shapes.mjs?v=0.12.2';
 import {appendStandardColors} from './color-palette.mjs';
-import {installDrawing,strokeSvg} from './drawing.mjs?v=0.12.1';
-import {iconPaths,colorValue,validHex,contrast,snapMove,overlappingItems,selectionBarPosition,anchoredPanelPosition} from './visual-tools.mjs?v=0.12.1';
-import {fileError,clipboardImages} from './file-policy.mjs?v=0.12.1';
+import {installDrawing,strokeSvg} from './drawing.mjs?v=0.12.2';
+import {iconPaths,colorValue,validHex,contrast,snapMove,overlappingItems,selectionBarPosition,anchoredPanelPosition} from './visual-tools.mjs?v=0.12.2';
+import {fileError,clipboardImages} from './file-policy.mjs?v=0.12.2';
 import {readBoardView,writeBoardView} from './ui-state.mjs';
 import {uid,screenToWorld,zoomAt,shapeMarkup,connectionPath,connectionGeometry,connectionEndpoints,outlinePoint,curvePath,
-  selectionBounds,canConnectElement,intersects,expandGroups,taskItems,smoothWheelFactor,placementAnchor,edgePanVelocity,creationDefaults,draftHeight,fitResizedCard} from './canvas-model.mjs?v=0.12.1';
+  selectionBounds,canConnectElement,intersects,expandGroups,taskItems,smoothWheelFactor,placementAnchor,edgePanVelocity,creationDefaults,draftHeight,fitResizedCard} from './canvas-model.mjs?v=0.12.2';
 
 export function createCanvasUI({root,getBoard,commit,commitBatch,send,toast,openRoom,tools,icons,onDirty,beginAction,endAction,requestHistory}) {
   const $=s=>root.querySelector(s),canvas=$('#canvas'),world=$('#world'),container=$('#elements'),svg=$('#connections');
@@ -27,7 +27,6 @@ export function createCanvasUI({root,getBoard,commit,commitBatch,send,toast,open
   listen(window,'pagehide',saveView);
   let navigationMode='mouse';try{navigationMode=localStorage.getItem('nook-navigation')||'mouse';}catch{/* Navigation still works without browser storage. */}
   let canvasMode='select',pendingFile=null;const overlapWarnings=new Set();let space=false,suppressToolClick=false,filePoint,lastCursor=null,lastCursorAt=0,selfCursor,disposed=false,lastPointer;
-  const hitMeasure=document.createElement('div');hitMeasure.className='text-hit-measure';root.append(hitMeasure);
   const measure=document.createElement('span');measure.className='text-measure';root.append(measure);
   const marquee=document.createElement('div');marquee.className='marquee';marquee.hidden=true;canvas.append(marquee);
   const boundsNode=document.createElement('div');boundsNode.className='multi-bounds';boundsNode.hidden=true;
@@ -84,7 +83,7 @@ export function createCanvasUI({root,getBoard,commit,commitBatch,send,toast,open
 
   function nextLayer(direction){const zs=Object.values(B()?.elements||{}).map(el=>el.z||0);return Math.max(-1000000,Math.min(1000000,(direction>0?Math.max(0,...zs):Math.min(0,...zs))+direction));}
   function newElement(type,p){const {w,h,font_size}=creationDefaults[type];
-    return {id:uid(),type,...p,w:type==='shape'&&chosenShape==='circle'?180:w,h,z:nextLayer(1),text:'',font_size,text_color:'purple',
+    return {id:uid(),type,...p,w:type==='shape'&&chosenShape==='circle'?150:w,h:type==='shape'&&chosenShape==='circle'?150:type==='shape'&&['triangle','diamond'].includes(chosenShape)?160:h,z:nextLayer(1),text:'',font_size,text_color:'purple',
       ...(type==='icon'?{icon:chosenIcon,color:'#210a3b'}:{}),...(type==='text'?{auto_width:true}:{}),...(type==='note'||type==='shape'?{color:'lilac'}:{}),...(type==='shape'?{shape:chosenShape}:{}),
       ...(type==='task'?{items:[{id:uid(),text:'',done:false}]}:{})};
   }
@@ -263,7 +262,6 @@ export function createCanvasUI({root,getBoard,commit,commitBatch,send,toast,open
     if(el.type==='task'){const card=getComputedStyle(node),titleHeight=content.getBoundingClientRect().height/view.z+7;h=Math.ceil(parseFloat(card.paddingTop)+parseFloat(card.paddingBottom)+2+titleHeight+node.querySelector('.task-list').scrollHeight+node.querySelector('.task-insert-zone').offsetHeight+node.querySelector('.task-add').offsetHeight);}
     return {h:Math.max(el.h,50,Math.min(10000,h))};
   }
-  function taskTextHit(input,e){if(!input.value.trim())return false;const r=input.getBoundingClientRect(),style=getComputedStyle(input),scale=view.z;Object.assign(hitMeasure.style,{left:`${r.left}px`,top:`${r.top}px`,width:`${r.width}px`,fontFamily:style.fontFamily,fontWeight:style.fontWeight,fontStyle:style.fontStyle,fontSize:`${parseFloat(style.fontSize)*scale}px`,lineHeight:`${parseFloat(style.lineHeight)*scale}px`,letterSpacing:`${(parseFloat(style.letterSpacing)||0)*scale}px`,padding:`${parseFloat(style.paddingTop)*scale}px ${parseFloat(style.paddingRight)*scale}px ${parseFloat(style.paddingBottom)*scale}px ${parseFloat(style.paddingLeft)*scale}px`});hitMeasure.textContent=input.value;const range=document.createRange();range.selectNodeContents(hitMeasure);return [...range.getClientRects()].some(box=>e.clientX>=box.left-4&&e.clientX<=box.right+4&&e.clientY>=box.top-2&&e.clientY<=box.bottom+2);}
   function textHit(node,e){const content=node.querySelector('.content');if(!content||getComputedStyle(content).display==='none')return false;
     if(node.classList.contains('task')&&content.contains(e.target)){const box=content.getBoundingClientRect();return box.height>0&&e.clientX>=box.left&&e.clientX<=box.right&&e.clientY>=box.top&&e.clientY<=box.bottom;}
     if(!content.textContent.trim())return false;
@@ -328,7 +326,7 @@ export function createCanvasUI({root,getBoard,commit,commitBatch,send,toast,open
     if(id&&(e.ctrlKey||e.metaKey||e.shiftKey)){e.preventDefault();finishEditing();const next=new Set(selection),group=expandGroups(B().elements,[id]);if(next.has(id))for(const gid of group)next.delete(gid);else for(const gid of group)next.add(gid);select(next,false);canvas.focus({preventScroll:true});return;}
     if(node){const reorder=e.target.closest('[data-reorder]');if(reorder){const input=document.activeElement;if(input?.classList.contains('task-item-text'))saveItem(node,input);drag={kind:'reorder',id,item:reorder.dataset.reorder,original:structuredClone(B().elements[id])};canvas.setPointerCapture(e.pointerId);e.preventDefault();return;}
       if(e.target.closest('.resize')){beginMove(e,id,selection.size>1?'resize-selection':'resize');return;}
-      const taskInput=e.target.closest('.task-item-text');if(taskInput){if(!taskTextHit(taskInput,e))beginMove(e,id);else deleteSelectionArmed=null;return;}
+      const taskInput=e.target.closest('.task-item-text');if(taskInput){deleteSelectionArmed=null;return;}
       if(e.target.closest('input,textarea,button,a'))return;
       if(editable(B().elements[id])&&textHit(node,e)){startEdit(node);return;}beginMove(e,id);return;
     }
@@ -338,7 +336,7 @@ export function createCanvasUI({root,getBoard,commit,commitBatch,send,toast,open
   function handlePointerMove(e,fromEdgePan=false){
     if(!fromEdgePan&&drag)queueMicrotask(()=>{if(drag)queueEdgePan(e);});
     if(!B())return;lastPointer={clientX:e.clientX,clientY:e.clientY};const viewport=canvas.getBoundingClientRect();lastCursor={...pt(e),visible:e.clientX>=viewport.left&&e.clientX<=viewport.right&&e.clientY>=viewport.top&&e.clientY<=viewport.bottom};if(drag?.kind!=='pan')publishCursor();
-    const node=e.target.closest('.element');if(!drag){if(activeTool==='connection')showConnectTarget(connectionTarget(e));if(canvasMode==='hand'&&!activeTool){canvas.style.cursor='grab';return;}canvas.style.cursor='';canvas.classList.toggle('over-edge',!!node&&edgeHit(node,e));if(node){const taskInput=e.target.closest('.task-item-text'),overWords=taskInput?taskTextHit(taskInput,e):textHit(node,e);node.style.cursor=activeTool?'crosshair':overWords?'text':'move';if(taskInput)taskInput.style.cursor=node.style.cursor;const content=node.querySelector('.content');if(content)content.style.cursor=node.style.cursor;}previewAt(pt(e));return;}
+    const node=e.target.closest('.element');if(!drag){if(activeTool==='connection')showConnectTarget(connectionTarget(e));if(canvasMode==='hand'&&!activeTool){canvas.style.cursor='grab';return;}canvas.style.cursor='';canvas.classList.toggle('over-edge',!!node&&edgeHit(node,e));if(node){const taskInput=e.target.closest('.task-item-text'),overWords=!!taskInput||textHit(node,e);node.style.cursor=activeTool?'crosshair':overWords?'text':'move';if(taskInput)taskInput.style.cursor=node.style.cursor;const content=node.querySelector('.content');if(content)content.style.cursor=node.style.cursor;}previewAt(pt(e));return;}
     if(drag.kind==='pan'){drag.moved ||= Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>5;if(!drag.moved)return;view.x=drag.v.x+e.clientX-drag.sx;view.y=drag.v.y+e.clientY-drag.sy;transform();return;}
     if(['connect','reconnect'].includes(drag.kind)){drag.clientX=e.clientX;drag.clientY=e.clientY;drag.moved=Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>5;drag.toPoint=pt(e);const target=connectionTarget(e);showConnectTarget(target);drag.toNode=target;renderConnections();return;}
 
@@ -437,5 +435,5 @@ export function createCanvasUI({root,getBoard,commit,commitBatch,send,toast,open
 
   return {receiveDrawing:drawing.receive,render,transform,finishEditing,preserveDrafts,isDragging,receiveCursor,syncPresence,resetCursors,setSelfCursor:id=>selfCursor=id,
     isEditing:()=>!!editing||!!document.activeElement?.closest('.task-item-text'),
-    dispose(){arrowDefs.remove();$('#rotation-menu').hidden=true;rotationHandle.remove();boundsNode.remove();drawing.dispose();saveView();clearTimeout(choiceTimer);hitMeasure.remove();revealLayer.remove();stopEdgePan();disposed=true;finishEditing();lifecycle.abort();clearInterval(heartbeat);cancelAnimationFrame(frame);cancelAnimationFrame(zoomFrame);clearTimeout(editTimer);for(const node of nodes.values())for(const input of node.querySelectorAll('input,textarea'))clearTimeout(input.saveTimer);measure.remove();clearPreview();resetCursors();}};
+    dispose(){arrowDefs.remove();$('#rotation-menu').hidden=true;rotationHandle.remove();boundsNode.remove();drawing.dispose();saveView();clearTimeout(choiceTimer);revealLayer.remove();stopEdgePan();disposed=true;finishEditing();lifecycle.abort();clearInterval(heartbeat);cancelAnimationFrame(frame);cancelAnimationFrame(zoomFrame);clearTimeout(editTimer);for(const node of nodes.values())for(const input of node.querySelectorAll('input,textarea'))clearTimeout(input.saveTimer);measure.remove();clearPreview();resetCursors();}};
 }

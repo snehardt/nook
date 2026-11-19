@@ -15,12 +15,12 @@
 #landing .welcome{display:grid;grid-template-columns: .85fr 1.15fr;gap:55px;align-items:center;padding:66px 0 58px}
 #landing h1{font-size:47px;line-height:1.13;font-weight:550;letter-spacing:-1.9px;margin:0 0 22px}
 #landing h1 span{display:block;color:#795392}
-#landing .welcome-copy>p{font-size:15px;line-height:1.8;color:#79717f;max-width:340px;margin:0 0 28px}
+#landing .welcome-copy>p{font-size:15px;line-height:1.8;color:#6b6074;max-width:340px;margin:0 0 28px}
 #landing .actions{display:flex;gap:11px}
 #landing .actions button{border-radius:5px;border:1px solid #d8cedf;padding:12px 17px;font-size:13px;min-height:44px;background:transparent;color:#382340}
 #landing .actions .primary{background:#281135;color:#fff;border-color:#281135;display:flex;align-items:center;gap:9px}
 #landing .primary svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.5}
-#landing .welcome-copy>small{display:block;font-size:11px;color:#93879c;margin-top:16px}
+#landing .welcome-copy>small{display:block;font-size:11px;color:#6b6074;margin-top:16px}
 #landing .board{height:350px;position:relative;border:1px solid #d9cfe0;border-radius:6px;background:#fff;box-shadow:0 8px 26px #39234707;overflow:hidden;isolation:isolate}
 #landing .board-head{height:39px;border-bottom:1px solid #e6dfea;display:flex;align-items:center;justify-content:space-between;padding:0 15px;font-size:11px;color:#6e5a7b;background:#fcfafc}
 #landing .board-head .avatars{display:flex}
@@ -37,20 +37,20 @@
 #landing .board-art .line{fill:none;stroke:#9d80b1;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 #landing .board-art .ink{stroke:#784796;stroke-width:2}
 #landing .zoom{position:absolute;bottom:10px;left:10px;font-size:8px;color:#8e7a9b;background:#fff;border:1px solid #e4dbe9;border-radius:3px;padding:4px 7px}
-#landing .board-note{display:flex;align-items:center;gap:7px;margin:13px 0 0;font-size:11px;color:#93879c}
+#landing .board-note{display:flex;align-items:center;gap:7px;margin:13px 0 0;font-size:11px;color:#6b6074}
 #landing .board-note:before{content:'';width:5px;height:5px;border-radius:50%;background:#b29ac3}
 #landing .recent{border-top:1px solid #e1dce5;padding-top:28px}
 #landing .recent-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 #landing .recent h2{font-size:16px;font-weight:550;letter-spacing:-.2px;margin:0}
-#landing .recent-heading a{font-size:11px;color:#8e7b9a}
+#landing .recent-heading a{font-size:11px;color:#6b6074}
 #landing .recent-list{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 #landing .recent-item{display:flex;align-items:center;gap:18px;padding:17px 0;border-bottom:1px solid #e8e2ec}
 #landing .thumb{width:92px;height:60px;flex:none;border:1px solid #e1d5e8;border-radius:3px;background:#f7f2fa;padding:8px}
 #landing .thumb svg{width:100%;height:100%;fill:none;stroke:#ae92c1;stroke-width:1.2}
 #landing .recent-item strong{font-size:13px;font-weight:500}
-#landing .recent-item p{font-size:11px;color:#978b9f;margin:6px 0 0}
-#landing .recent-item .dots{margin-left:auto;font-size:14px;color:#9c89aa;letter-spacing:2px;padding:5px}
-#landing footer{display:flex;justify-content:space-between;color:#9b8fa3;font-size:11px;padding:28px 0 26px}
+#landing .recent-item p{font-size:11px;color:#6b6074;margin:6px 0 0}
+#landing .recent-item .dots{margin-left:auto;font-size:14px;color:#6b6074;letter-spacing:2px;padding:5px}
+#landing footer{display:flex;justify-content:space-between;color:#6b6074;font-size:11px;padding:28px 0 26px}
 #landing footer a{display:flex;align-items:center;gap:6px}
 #landing footer svg{height:13px;width:13px;fill:none;stroke:currentColor;stroke-width:1.4}
 #landing .preview-notice{display:none}

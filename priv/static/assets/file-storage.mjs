@@ -1,4 +1,4 @@
-import {imageCardSize} from './file-policy.mjs?v=0.12.1';
+import {imageCardSize} from './file-policy.mjs?v=0.12.2';
 
 export function fileUrl(code,el,download=false){
   if(!el.asset_id)return el.data||'';

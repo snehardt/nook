@@ -6,7 +6,7 @@ export function canConnectElement(el,elements){
 }
 export const creationDefaults = {
   text:{w:360,h:80,font_size:18}, note:{w:320,h:200,font_size:16},
-  shape:{w:230,h:180,font_size:16},task:{w:320,h:190,font_size:16},
+  shape:{w:220,h:120,font_size:16},task:{w:300,h:140,font_size:16},
   icon:{w:80,h:80,font_size:16},idea:{w:240,h:160,font_size:16},file:{w:230,h:120,font_size:16}
 };
 export function draftHeight(current, required) {return Math.min(10000,Math.max(current,required));}

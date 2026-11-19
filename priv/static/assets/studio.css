@@ -1,5 +1,5 @@
 /* Nook's shared studio surface: quiet chrome, open canvas, tactile ink previews. */
-:root{--purple:#281135;--accent:#a987cf;--ink:#302936;--muted:#7c7483;--border:#e1dce5;--studio-paper:#fcfbfd;font-family:'DM Sans',sans-serif;background:var(--studio-paper)}
+:root{--purple:#281135;--accent:#a987cf;--ink:#302936;--muted:#6b6074;--border:#e1dce5;--studio-paper:#fcfbfd;font-family:'DM Sans',sans-serif;background:var(--studio-paper)}
 body{background:var(--studio-paper)}
 h1,h2,h3{font-family:'DM Sans',sans-serif;letter-spacing:-.4px}
 button.primary,.primary,.secondary,button.secondary{border-radius:5px;box-shadow:none;transition:background .15s;gap:10px;font-size:13px;padding:10px 16px;min-height:38px;font-weight:500}
@@ -32,3 +32,29 @@ dialog{border-radius:6px;box-shadow:0 12px 50px #28113520;border-color:#d8cede;p
 .landing-nav .brand,.account-header .brand,.studio-auth-art img{mix-blend-mode:lighten}.studio-preferences #navigation-settings .studio-setting-row{color:var(--ink)}.studio-preferences #navigation-settings input[type=checkbox]{appearance:none;width:32px;height:18px;border:1px solid #c9bfce;border-radius:12px;background:#e3dde8;position:relative;cursor:pointer}.studio-preferences #navigation-settings input[type=checkbox]:before{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:white;top:2px;left:2px}.studio-preferences #navigation-settings input[type=checkbox]:checked{background:#684582;border-color:#684582}.studio-preferences #navigation-settings input[type=checkbox]:checked:before{transform:translateX(14px)}
 
 .studio-preferences .studio-setting-row input[type=checkbox],.studio-preferences #navigation-settings input[type=checkbox]{min-height:18px;max-height:18px;padding:0;flex:0 0 32px}#room-dialog .participant-dot{width:27px;height:27px;display:grid;place-items:center;border-radius:50%;font-size:11px;background:#ece1f5;color:#604279;flex:none}#room-dialog .participant-edit{width:27px;height:27px;padding:5px;color:#7e668e;border-radius:3px}#room-dialog .participant-edit:hover{background:#eee6f5}#room-dialog .participant-edit svg{width:17px;height:17px}#room-dialog .room-hint{display:none}#room-dialog .room-people{margin-top:20px}#room-dialog .room-name-form{padding:12px 0 2px}#room-dialog .copy-row input{border-radius:4px;background:#fff}#room-dialog .room-feedback{font-size:11px;margin-top:12px}
+
+/* Final polish: stronger muted plum text, with the same paper and ink palette. */
+#workspace #save-status,#workspace #collaborators,#workspace .app-header .account-nav{color:#6b6074}
+#workspace #tool-dock .tool svg{color:inherit}
+#workspace #tool-dock .tool[data-tool=note] svg{color:#926a24;fill:#fff0bc}
+#workspace #tools-toggle:before,#workspace #selection-count,.studio-subtitle,.studio-auth-link a,.account-main .auth-heading p,.account-main .field-description{color:#6b6074}
+#room-dialog label,#room-dialog #advanced-sharing summary,#room-dialog .participant-role,#room-dialog .room-toggle,#room-dialog #room-people-count,dialog>p,dialog form>p,dialog form>label{color:#6b6074}
+#workspace .element.task>.content:empty::before,#workspace .task-item-text::placeholder{color:#71617e;opacity:1}
+.studio-settings-pane small,.studio-settings-pane p,.studio-setting-row output,.board-card-open>span:last-child,.guest-row>span:not(:first-child),.deleted-library summary{color:#6b6074}
+#workspace .task-item-text{cursor:text}
+#workspace .task-row.completed .task-item-text{color:#786b81}
+@media(pointer:coarse){
+ #workspace #tool-dock{width:54px;max-width:54px}
+ #workspace #tool-dock .tool{width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px}
+ #workspace #tool-dock #tools-toggle{width:44px;min-width:44px;height:30px;min-height:30px}
+ #workspace #mode-select,#workspace #mode-hand,#studio-settings-open{width:44px;height:44px;min-height:44px}
+ #workspace .zoom-controls button{min-width:36px;min-height:36px}
+ #room-dialog .participant-edit{width:40px;height:40px;padding:10px}
+ #workspace .task-remove,#workspace .task-reorder{min-width:30px;min-height:30px}
+ .studio-settings-tabs button{min-height:44px}
+}
+#workspace #canvas.hand-mode .task-item-text{cursor:grab!important}
+#workspace #canvas.panning .task-item-text{cursor:grabbing!important}
+#workspace .task-remove,#workspace .task-reorder{color:#71617e}
+@media(pointer:coarse){#workspace #icon-menu,#workspace #color-menu{max-width:calc(100vw - 84px)}.studio-preferences header button{min-width:40px;min-height:40px}#landing footer button{min-height:40px;min-width:70px}#room-dialog .copy-row button{min-height:44px}}
+body{-webkit-tap-highlight-color:rgba(121,83,146,.16)}
