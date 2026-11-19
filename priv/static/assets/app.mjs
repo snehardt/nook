@@ -1,8 +1,8 @@
-import {installStudioSettings} from './studio-settings.mjs?v=0.12.0';
-import {openRecoveryStore} from './recovery-store.mjs?v=0.12.0';
-import {BoardHistory,actionLabel,guardedHistoryPlan} from './history.mjs?v=0.12.0';
+import {installStudioSettings} from './studio-settings.mjs?v=0.12.1';
+import {openRecoveryStore} from './recovery-store.mjs?v=0.12.1';
+import {BoardHistory,actionLabel,guardedHistoryPlan} from './history.mjs?v=0.12.1';
 import {saveState,loadFailure} from './ui-state.mjs';
-import {createCanvasUI} from './canvas-ui.mjs?v=0.12.0';
+import {createCanvasUI} from './canvas-ui.mjs?v=0.12.1';
 import {Socket, Presence} from './phoenix.mjs';
 import {prepareOperation, optimisticBoard, wireOperation, resolveConflict, describeElement} from './collaboration-model.mjs';
 import {uid, applyOperation} from './canvas-model.mjs';
@@ -168,7 +168,21 @@ async function refreshSnapshot(){try{const snapshot=await api(`/api/boards/${boa
 function loseAccess(message){ready=false;$('#connection-notice').hidden=true;$('#board-load-state').hidden=true;ui.resetCursors();$('#conflict-dialog').close();$('#room-dialog').close();$('#sharing-confirm-dialog').close();canvas.inert=true;$('#toolbar').inert=true;$('#selection-bar').hidden=true;$('#access-message').hidden=false;$('#access-reason').textContent=message;elements.replaceChildren();$('#connections').replaceChildren();$('#save-status').textContent='Access unavailable';channel?.leave();}
 async function refreshAccess(){try{const r=await fetch(`/api/boards/${board.code}`);if(r.status===404){loseAccess('This board expired, was deleted, or your permission changed. Sign in or ask its owner for a new invitation.');return;}if(r.ok){const info=await r.json();for(const key of ['kind','can_manage','can_claim','sharing_enabled','sharing_active','room_open','expires_at'])board[key]=serverBoard[key]=info[key];$('#room-open').checked=!!board.room_open;$('#board-title').readOnly=!board.can_manage;const label=$('.board-lifecycle>span');if(label&&board.kind==='permanent')label.textContent=`Saved board Â· ${board.sharing_active?'shared with guests':'private'}`;}}catch{/* A network interruption keeps unsaved operations queued. */}}
 function rememberBoard(info){if(!info?.code)return;try{let list=JSON.parse(localStorage.getItem('nook-recent-boards')||'[]');if(!Array.isArray(list))list=[];list=[{code:info.code,title:info.title||'Untitled board',kind:info.kind,expires_at:info.expires_at,opened:Date.now()},...list.filter(item=>item.code!==info.code)].slice(0,12);localStorage.setItem('nook-recent-boards',JSON.stringify(list));}catch{/* Browsing stays possible with storage disabled. */}}
-function showRecentBoards(){try{const list=JSON.parse(localStorage.getItem('nook-recent-boards')||'[]');if(!Array.isArray(list)||!list.length)return;$('#recent-boards').hidden=false;for(const item of list.slice(0,12)){if(!/^[A-Z2-7]{12,13}$/.test(item.code))continue;const li=document.createElement('li'),a=document.createElement('a'),small=document.createElement('small');a.href=`/b/${item.code}`;a.textContent=item.title||'Untitled board';small.textContent=item.kind==='permanent'?'Saved board':item.expires_at&&Date.parse(item.expires_at)<Date.now()?'Quick board · may have expired':'Quick board';li.append(a,small);$('#recent-list').append(li);}}catch{/* No recents when storage is unavailable. */}}
+function showRecentBoards(){try{
+  const list=JSON.parse(localStorage.getItem('nook-recent-boards')||'[]');if(!Array.isArray(list))return;
+  const valid=list.slice(0,12).filter(item=>item&&/^[A-Z2-7]{12,13}$/.test(item.code));if(!valid.length)return;
+  $('#recent-boards').hidden=false;$('#recent-list').replaceChildren();
+  const today=new Date();today.setHours(0,0,0,0);const yesterday=new Date(today);yesterday.setDate(yesterday.getDate()-1);
+  for(const item of valid){
+    const li=document.createElement('li'),link=document.createElement('a'),thumb=document.createElement('span'),label=document.createElement('div'),title=document.createElement('strong'),meta=document.createElement('p');
+    link.className='recent-item';link.href=`/b/${item.code}`;thumb.className='thumb';thumb.setAttribute('aria-hidden','true');
+    thumb.innerHTML='<svg viewBox="0 0 80 48"><rect x="4" y="9" width="27" height="31" fill="#e9dcf5" stroke="none"/><path d="M9 18h16M9 24h12M9 30h13M35 24h17m-5-4 5 4-5 4"/><ellipse cx="66" cy="22" rx="11" ry="8"/></svg>';
+    title.textContent=item.title||'Untitled board';const opened=new Date(item.opened),validDate=Number.isFinite(opened.getTime());
+    meta.textContent=item.expires_at&&Date.parse(item.expires_at)<Date.now()?'May have expired':validDate?(opened>=today?'Opened today':opened>=yesterday?'Opened yesterday':`Opened ${opened.toLocaleDateString(undefined,{month:'short',day:'numeric'})}`):item.kind==='permanent'?'Saved board':'Quick board';
+    label.append(title,meta);link.append(thumb,label);li.append(link);$('#recent-list').append(li);
+  }
+}catch{/* Opening the home page does not require device storage. */}}
+
 if(!location.pathname.startsWith('/b/'))showRecentBoards();
 start();
 return () => { studioSettings.dispose();ui.dispose();draftStore?.close?.();lifecycle.abort();clearTimeout(admissionTimer);clearTimeout(retrySaveTimer);socket?.disconnect(); clearTimeout(toastTimer); };

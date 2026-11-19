@@ -1,5 +1,5 @@
 import {rotatePoint,itemCenter} from './rotation.mjs';
-import {simplifyStroke,makeStroke} from './drawing.mjs?v=0.12.0';
+import {simplifyStroke,makeStroke} from './drawing.mjs?v=0.12.1';
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const bounds=points=>{let x=Infinity,y=Infinity,right=-Infinity,bottom=-Infinity;for(const p of points){x=Math.min(x,p.x);y=Math.min(y,p.y);right=Math.max(right,p.x);bottom=Math.max(bottom,p.y);}return {x,y,w:right-x,h:bottom-y};};
 export const worldPoints=el=>el.points.map(([x,y])=>rotatePoint({x:el.x+x*el.w,y:el.y+y*el.h},itemCenter(el),el.rotation||0));

@@ -1,13 +1,13 @@
-import {fileUrl,uploadFile} from './file-storage.mjs?v=0.12.0';
+import {fileUrl,uploadFile} from './file-storage.mjs?v=0.12.1';
 import {rotatePoint,itemCenter,rotatedBounds,rotationChanges,angleStep} from './rotation.mjs';
-import {cleanedStrokes} from './drawing-shapes.mjs?v=0.12.0';
+import {cleanedStrokes} from './drawing-shapes.mjs?v=0.12.1';
 import {appendStandardColors} from './color-palette.mjs';
-import {installDrawing,strokeSvg} from './drawing.mjs?v=0.12.0';
-import {iconPaths,colorValue,validHex,contrast,snapMove,overlappingItems,selectionBarPosition,anchoredPanelPosition} from './visual-tools.mjs?v=0.12.0';
-import {fileError,clipboardImages} from './file-policy.mjs?v=0.12.0';
+import {installDrawing,strokeSvg} from './drawing.mjs?v=0.12.1';
+import {iconPaths,colorValue,validHex,contrast,snapMove,overlappingItems,selectionBarPosition,anchoredPanelPosition} from './visual-tools.mjs?v=0.12.1';
+import {fileError,clipboardImages} from './file-policy.mjs?v=0.12.1';
 import {readBoardView,writeBoardView} from './ui-state.mjs';
 import {uid,screenToWorld,zoomAt,shapeMarkup,connectionPath,connectionGeometry,connectionEndpoints,outlinePoint,curvePath,
-  selectionBounds,canConnectElement,intersects,expandGroups,taskItems,smoothWheelFactor,placementAnchor,edgePanVelocity,creationDefaults,draftHeight,fitResizedCard} from './canvas-model.mjs?v=0.12.0';
+  selectionBounds,canConnectElement,intersects,expandGroups,taskItems,smoothWheelFactor,placementAnchor,edgePanVelocity,creationDefaults,draftHeight,fitResizedCard} from './canvas-model.mjs?v=0.12.1';
 
 export function createCanvasUI({root,getBoard,commit,commitBatch,send,toast,openRoom,tools,icons,onDirty,beginAction,endAction,requestHistory}) {
   const $=s=>root.querySelector(s),canvas=$('#canvas'),world=$('#world'),container=$('#elements'),svg=$('#connections');

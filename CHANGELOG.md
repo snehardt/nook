@@ -1,3 +1,10 @@
+# 0.12.1 — Approved welcome screen (November 19, 2026)
+
+- Applied the approved welcome layout: plum header, Welcome to Nook heading, New whiteboard and Join a room actions, and the illustrated whiteboard with notes and drawings. Preserved existing account navigation and settings.
+- Recent boards use real browser history with safe titles, working board links, and opened dates. The section appears only when valid recent boards exist; no example boards are inserted into history.
+- Scoped the welcome styles to the landing page and retained the approved responsive phone layout.
+- Verification: 184 backend and 81 JavaScript tests passed. Browser checks covered board creation, joining, settings, real recents, reopening a recent board, and a 390px viewport without horizontal overflow. No browser exceptions.
+
 # 0.12.0 — Quiet Studio (November 18, 2026)
 
 - Unified login, registration, account settings, board lists, room dialogs, popovers and canvas controls around a restrained plum-and-cream studio style. Replaced promotional landing copy with a practical Boards menu, and board-card grids with simple rows and tucked-away actions.
