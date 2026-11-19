@@ -1,3 +1,11 @@
+# 0.12.0 — Quiet Studio (November 18, 2026)
+
+- Unified login, registration, account settings, board lists, room dialogs, popovers and canvas controls around a restrained plum-and-cream studio style. Replaced promotional landing copy with a practical Boards menu, and board-card grids with simple rows and tucked-away actions.
+- Moved creation tools into a slim left rail, with Select above, Hand and Settings below, and zoom controls at bottom left. Small icons retain accessible names and tooltips. Popovers open beside the relevant tool and stay within smaller viewports.
+- Added a shared settings sheet for General, Drawing and Navigation. Drawing includes a live ink preview, pen color, brush size, touch and smoothing controls; changes apply to the active pen and existing saved preferences. Kept raw strokes and smoothing off by default.
+- Room invitations use a compact side sheet with a short code, link, participant initials and a pencil to edit your name. Advanced room controls remain collapsed.
+- Verification: 184 backend tests and 81 JavaScript tests passed. Browser checks covered pen-preview settings applying to actual ink, saved navigation preferences, rail and popover placement, and desktop and 390px layouts. Existing authentication and board lifecycle tests pass with the new labels.
+
 # 0.11.9 — Continuous ink and separate file storage (November 18, 2026)
 
 - Removed the 2,048-point interruption and separate 500-stroke cap. A gesture can use the board's remaining 100,000-point allowance as one selectable, movable, rotatable, erasable and undoable stroke. Raw samples are preserved; drawing previews update once per animation frame. The existing 10,000-unit size and 2,000-object board safeguards remain.

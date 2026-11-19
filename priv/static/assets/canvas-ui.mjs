@@ -1,13 +1,13 @@
-import {fileUrl,uploadFile} from './file-storage.mjs?v=0.11.9';
+import {fileUrl,uploadFile} from './file-storage.mjs?v=0.12.0';
 import {rotatePoint,itemCenter,rotatedBounds,rotationChanges,angleStep} from './rotation.mjs';
-import {cleanedStrokes} from './drawing-shapes.mjs?v=0.11.9';
+import {cleanedStrokes} from './drawing-shapes.mjs?v=0.12.0';
 import {appendStandardColors} from './color-palette.mjs';
-import {installDrawing,strokeSvg} from './drawing.mjs?v=0.11.9';
-import {iconPaths,colorValue,validHex,contrast,snapMove,overlappingItems,selectionBarPosition,anchoredPanelPosition} from './visual-tools.mjs?v=0.11.9';
-import {fileError,clipboardImages} from './file-policy.mjs?v=0.11.9';
+import {installDrawing,strokeSvg} from './drawing.mjs?v=0.12.0';
+import {iconPaths,colorValue,validHex,contrast,snapMove,overlappingItems,selectionBarPosition,anchoredPanelPosition} from './visual-tools.mjs?v=0.12.0';
+import {fileError,clipboardImages} from './file-policy.mjs?v=0.12.0';
 import {readBoardView,writeBoardView} from './ui-state.mjs';
 import {uid,screenToWorld,zoomAt,shapeMarkup,connectionPath,connectionGeometry,connectionEndpoints,outlinePoint,curvePath,
-  selectionBounds,canConnectElement,intersects,expandGroups,taskItems,smoothWheelFactor,placementAnchor,edgePanVelocity,creationDefaults,draftHeight,fitResizedCard} from './canvas-model.mjs?v=0.11.9';
+  selectionBounds,canConnectElement,intersects,expandGroups,taskItems,smoothWheelFactor,placementAnchor,edgePanVelocity,creationDefaults,draftHeight,fitResizedCard} from './canvas-model.mjs?v=0.12.0';
 
 export function createCanvasUI({root,getBoard,commit,commitBatch,send,toast,openRoom,tools,icons,onDirty,beginAction,endAction,requestHistory}) {
   const $=s=>root.querySelector(s),canvas=$('#canvas'),world=$('#world'),container=$('#elements'),svg=$('#connections');
@@ -101,7 +101,7 @@ export function createCanvasUI({root,getBoard,commit,commitBatch,send,toast,open
   function stopEdgePan(){cancelAnimationFrame(edgeFrame);edgeFrame=0;edgeTime=0;edgePointer=null;}
   function edgeVelocity(){if(!edgePointer||!drag||disposed||canvas.inert||document.visibilityState==='hidden')return {x:0,y:0};
     if(drag.originals&&!drag.moved||['tool','connect','reconnect'].includes(drag.kind)&&!drag.moved||!['move','resize','resize-selection','tool','connect','reconnect','marquee'].includes(drag.kind))return {x:0,y:0};
-    const hit=document.elementFromPoint(edgePointer.clientX,edgePointer.clientY);if(hit?.closest('#toolbar,#selection-bar,.zoom-controls,dialog'))return {x:0,y:0};
+    const hit=document.elementFromPoint(edgePointer.clientX,edgePointer.clientY);if(hit?.closest('#tool-dock,#selection-bar,.zoom-controls,dialog'))return {x:0,y:0};
     const r=canvas.getBoundingClientRect();return edgePanVelocity(edgePointer.clientX-r.left,edgePointer.clientY-r.top,r.width,r.height);
   }
   function queueEdgePan(e){edgePointer={clientX:e.clientX,clientY:e.clientY,target:canvas};const v=edgeVelocity();if(!v.x&&!v.y){cancelAnimationFrame(edgeFrame);edgeFrame=0;edgeTime=0;return;}if(!edgeFrame){const now=performance.now();edgeTime=now-1000/60;stepEdgePan(now);}}
@@ -129,7 +129,7 @@ export function createCanvasUI({root,getBoard,commit,commitBatch,send,toast,open
   let choiceTimer,hoverChoice=null;
   function syncChoiceButtons(){for(const kind of ['shape','icon'])$(`[data-tool="${kind}"]`).setAttribute('aria-expanded',String(!$(`#${kind}-menu`).hidden));}
   function hideToolChoices(kind){$(`#${kind}-menu`).hidden=true;if(hoverChoice===kind)hoverChoice=null;syncChoiceButtons();}
-  function positionToolChoices(kind){const menu=$(`#${kind}-menu`),button=$(`[data-tool="${kind}"]`);menu.hidden=false;const r=button.getBoundingClientRect();menu.style.left=`${Math.max(12,Math.min(innerWidth-menu.offsetWidth-12,r.left+r.width/2-menu.offsetWidth/2))}px`;menu.style.top=`${r.bottom+8}px`;positionPanel(menu,shapeTarget||iconTarget?$('#selection-bar'):$('#toolbar'));syncChoiceButtons();}
+  function positionToolChoices(kind){const menu=$(`#${kind}-menu`),button=$(`[data-tool="${kind}"]`);menu.hidden=false;const r=button.getBoundingClientRect();menu.style.left=`${Math.max(12,Math.min(innerWidth-menu.offsetWidth-12,r.left+r.width/2-menu.offsetWidth/2))}px`;menu.style.top=`${r.bottom+8}px`;positionPanel(menu,shapeTarget||iconTarget?$('#selection-bar'):button);syncChoiceButtons();}
   function showHoverChoices(kind){if(!B()||drag)return;clearTimeout(choiceTimer);hoverChoice=kind;shapeTarget=false;iconTarget=false;hideToolChoices(kind==='shape'?'icon':'shape');hoverChoice=kind;positionToolChoices(kind);}
   function leaveChoices(kind){clearTimeout(choiceTimer);choiceTimer=setTimeout(()=>{if(hoverChoice===kind)hideToolChoices(kind);},200);}
   for(const kind of ['shape','icon']){const button=$(`[data-tool="${kind}"]`),menu=$(`#${kind}-menu`);button.setAttribute('aria-controls',`${kind}-menu`);button.setAttribute('aria-expanded','false');listen(button,'blur',()=>leaveChoices(kind));listen(button,'keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();showHoverChoices(kind);menu.querySelector('input,button')?.focus();}});listen(menu,'pointerenter',()=>clearTimeout(choiceTimer));listen(menu,'pointerleave',()=>leaveChoices(kind));listen(menu,'focusin',()=>clearTimeout(choiceTimer));listen(menu,'focusout',e=>{if(!menu.contains(e.relatedTarget))leaveChoices(kind);});}
